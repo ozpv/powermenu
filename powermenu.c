@@ -7,10 +7,10 @@
 #include <sys/reboot.h>
 
 typedef enum {
-    cancel,
-    poweroff,
-    reboot,
-    suspend,
+    power_cancel,
+    power_poweroff,
+    power_reboot,
+    power_suspend,
 } power_msg;
 
 typedef struct {
@@ -26,15 +26,15 @@ void handler(power_msg msg) {
         case cancel:
             printf("Cancelled\n");
             break;
-        case poweroff:
+        case power_poweroff:
 	    sync();
 	    reboot(RB_POWER_OFF);
             break;
-        case reboot:
+        case power_reboot:
 	    sync();
 	    reboot(RB_AUTOBOOT);
             break;
-        case suspend:
+        case power_suspend:
 	    sync();
 	    reboot(RB_SW_SUSPEND);
             break;
@@ -79,11 +79,11 @@ int main(int argc, char *argv[]) {
 
     for (int i = 1; i < argc; ++i) {
 	if (!strcmp(argv[i], "-p"))
-	    handler(poweroff);
+	    handler(power_poweroff);
 	else if (!strcmp(argv[i], "-r"))
-	    handler(reboot);
+	    handler(power_reboot);
 	else if (!strcmp(argv[i], "-s"))
-	    handler(suspend);
+	    handler(power_suspend);
     }
 
     int i = 0;  
