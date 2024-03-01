@@ -3,6 +3,9 @@
 #include <limits.h>
 #include <string.h>
 
+#include <unistd.h>
+#include <sys/reboot.h>
+
 typedef enum {
     cancel,
     poweroff,
@@ -24,10 +27,16 @@ void handler(power_msg msg) {
             printf("Cancelled\n");
             break;
         case poweroff:
+	    sync();
+	    reboot(RB_POWER_OFF);
             break;
         case reboot:
+	    sync();
+	    reboot(RB_AUTOBOOT);
             break;
         case suspend:
+	    sync();
+	    reboot(RB_SW_SUSPEND);
             break;
         default:
             break;
@@ -39,9 +48,8 @@ void match(const char *o) {
         exit(1);
 
     for (int i = 0; i < sizeof(options) / sizeof(options[0]); ++i) {
-        if (!strncmp(options[i].name, o, strlen(options[i].name))) {
+        if (!strncmp(options[i].name, o, strlen(options[i].name)))
             handler(options[i].msg);
-        }
     }
 }
 
@@ -64,10 +72,19 @@ const char *parse_o(char *cmd) {
     return buf;
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
     static char cmd[PATH_MAX]; 
     
     strcat(cmd, "echo \"");
+
+    for (int i = 1; i < argc; ++i) {
+	if (!strcmp(argv[i], "-p"))
+	    handler(poweroff);
+	else if (!strcmp(argv[i], "-r"))
+	    handler(reboot);
+	else if (!strcmp(argv[i], "-s"))
+	    handler(suspend);
+    }
 
     int i = 0;  
     for (; i < ((sizeof(options) / sizeof(options[0])) - 1); ++i) {
