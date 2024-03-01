@@ -7,7 +7,7 @@
 #include <sys/reboot.h>
 
 typedef enum {
-    power_cancel,
+    cancel,
     power_poweroff,
     power_reboot,
     power_suspend,
