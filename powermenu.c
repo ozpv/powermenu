@@ -27,15 +27,12 @@ void handler(power_msg msg) {
             printf("Cancelled\n");
             break;
         case power_poweroff:
-	    sync();
 	    reboot(RB_POWER_OFF);
             break;
         case power_reboot:
-	    sync();
 	    reboot(RB_AUTOBOOT);
             break;
         case power_suspend:
-	    sync();
 	    reboot(RB_SW_SUSPEND);
             break;
         default:
