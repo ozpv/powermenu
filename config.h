@@ -4,3 +4,5 @@ static const power_options options[] = {
     { "Suspend", power_suspend },
     { "Cancel", cancel },
 };
+
+static const char *default_prompt = "Powermenu:";

@@ -74,16 +74,16 @@ const char *get_uptime() {
     struct sysinfo si;
     char up[PATH_MAX];
 
-    if (sysinfo(&si)) {
+    if (sysinfo(&si) != 0) {
         printf("There was an error retrieving the system's uptime\n");
-	return "";
+	return default_prompt;
     }
 
     double days = si.uptime / 86400;
     double hours = (si.uptime / 3600) - (days * 24);
     double minutes = (si.uptime / 60) - (days * 1440) - (hours * 60);
 
-    sprintf(up, "Uptime: %.fd, %.fh, %.fm", days, hours, minutes);
+    sprintf(up, "Uptime: %.0fd, %.0fh, %.0fm", days, hours, minutes);
 
     return up;
 }
@@ -93,16 +93,16 @@ int main(int argc, char *argv[]) {
     
     strcat(cmd, "echo \"");
 
-    if (!strcmp(argv[1], "-p")) {
+    if (!strcmp(argv[1], "-p") && argc) {
         handler(power_poweroff);
         return 0;
-    } else if (!strcmp(argv[1], "-r")) {
+    } else if (!strcmp(argv[1], "-r") && argc) {
         handler(power_reboot);
         return 0;
-    } else if (!strcmp(argv[1], "-s")) {
+    } else if (!strcmp(argv[1], "-s") && argc) {
         handler(power_suspend);
 	return 0;
-    } else if (!strcmp(argv[1], "-u")) {
+    } else if (!strcmp(argv[1], "-u") && argc) {
         printf("%s", get_uptime());
 	return 0;
     }
