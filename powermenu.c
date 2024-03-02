@@ -72,9 +72,9 @@ const char *parse_o(char *cmd) {
 
 const char *get_uptime() {
     struct sysinfo si;
-    char up[PATH_MAX];
+    char up[PATH_MAX / 4];
 
-    if (sysinfo(&si) != 0) {
+    if (sysinfo(&si)) {
         printf("There was an error retrieving the system's uptime\n");
 	return default_prompt;
     }
@@ -83,29 +83,31 @@ const char *get_uptime() {
     double hours = (si.uptime / 3600) - (days * 24);
     double minutes = (si.uptime / 60) - (days * 1440) - (hours * 60);
 
-    sprintf(up, "Uptime: %.0fd, %.0fh, %.0fm", days, hours, minutes);
+    sprintf(up, "Uptime: %.0fd, %.0fh, %.0fm\0", days, hours, minutes);
 
     return up;
 }
 
 int main(int argc, char *argv[]) {
+    if (argc) {
+        if (!strcmp(argv[1], "-p")) {
+            handler(power_poweroff);
+            return 0;
+        } else if (!strcmp(argv[1], "-r")) {
+            handler(power_reboot);
+            return 0;
+        } else if (!strcmp(argv[1], "-s")) {
+            handler(power_suspend);
+    	return 0;
+        } else if (!strcmp(argv[1], "-u")) {
+            printf("%s", get_uptime());
+    	return 0;
+        }
+    }
+
     static char cmd[PATH_MAX]; 
     
     strcat(cmd, "echo \"");
-
-    if (!strcmp(argv[1], "-p") && argc) {
-        handler(power_poweroff);
-        return 0;
-    } else if (!strcmp(argv[1], "-r") && argc) {
-        handler(power_reboot);
-        return 0;
-    } else if (!strcmp(argv[1], "-s") && argc) {
-        handler(power_suspend);
-	return 0;
-    } else if (!strcmp(argv[1], "-u") && argc) {
-        printf("%s", get_uptime());
-	return 0;
-    }
 
     int i = 0;  
     for (; i < ((sizeof(options) / sizeof(options[0])) - 1); ++i) {
@@ -115,9 +117,9 @@ int main(int argc, char *argv[]) {
 
     strncat(cmd, options[i].name, strlen(options[i].name));
 
-    char final[PATH_MAX]; 
+    char final[PATH_MAX / 4]; 
     sprintf(final, "\" | dmenu -p \"%s\"", get_uptime());
-    strcat(cmd, final);
+    strncat(cmd, final, strlen(final));
 
     match(parse_o(cmd));
 
