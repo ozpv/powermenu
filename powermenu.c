@@ -114,7 +114,10 @@ int main(int argc, char *argv[]) {
     }
 
     strncat(cmd, options[i].name, strlen(options[i].name));
-    strcat(cmd, "\" | dmenu -p \"" + get_uptime() + "\"");
+
+    char final[PATH_MAX]; 
+    sprintf(final, "\" | dmenu -p \"%s\"", get_uptime());
+    strcat(cmd, final);
 
     match(parse_o(cmd));
 
