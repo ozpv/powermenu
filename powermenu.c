@@ -70,13 +70,13 @@ const char *parse_o(char *cmd) {
     return buf;
 }
 
-char *get_uptime() {
+const char *get_uptime() {
     struct sysinfo si;
     char up[PATH_MAX];
 
-    if (!sysinfo(&si)) {
-        printf("There was an error retrieving the system's uptime.");
-        exit(1);
+    if (sysinfo(&si)) {
+        printf("There was an error retrieving the system's uptime\n");
+	return "";
     }
 
     double days = si.uptime / 86400;
