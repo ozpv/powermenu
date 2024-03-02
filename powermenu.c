@@ -5,6 +5,7 @@
 
 #include <unistd.h>
 #include <sys/reboot.h>
+#include <sys/sysinfo.h>
 
 typedef enum {
     cancel,
@@ -69,18 +70,41 @@ const char *parse_o(char *cmd) {
     return buf;
 }
 
+const char *get_uptime() {
+    struct sysinfo si;
+    char up[PATH_MAX];
+
+    if (!sysinfo(&si)) {
+        printf("There was an error retrieving the system's uptime.");
+        exit(1);
+    }
+
+    double days = si.uptime / 86400;
+    double hours = (si.uptime / 3600) - (days * 24);
+    double minutes = (si.uptime / 60) - (days * 1440) - (hours * 60);
+
+    sprintf(up, "Uptime: %.fd, %.fh, %.fm", days, hours, minutes);
+
+    return up;
+}
+
 int main(int argc, char *argv[]) {
     static char cmd[PATH_MAX]; 
     
     strcat(cmd, "echo \"");
 
-    for (int i = 1; i < argc; ++i) {
-	if (!strcmp(argv[i], "-p"))
-	    handler(power_poweroff);
-	else if (!strcmp(argv[i], "-r"))
-	    handler(power_reboot);
-	else if (!strcmp(argv[i], "-s"))
-	    handler(power_suspend);
+    if (!strcmp(argv[1], "-p")) {
+        handler(power_poweroff);
+        return 0;
+    } else if (!strcmp(argv[1], "-r")) {
+        handler(power_reboot);
+        return 0;
+    } else if (!strcmp(argv[1], "-s")) {
+        handler(power_suspend);
+	return 0;
+    } else if (!strcmp(argv[1], "-u")) {
+        printf("%s", get_uptime());
+	return 0;
     }
 
     int i = 0;  
@@ -90,7 +114,7 @@ int main(int argc, char *argv[]) {
     }
 
     strncat(cmd, options[i].name, strlen(options[i].name));
-    strcat(cmd, "\" | dmenu");
+    strcat(cmd, "\" | dmenu -p \"" + get_uptime() + "\"");
 
     match(parse_o(cmd));
 
