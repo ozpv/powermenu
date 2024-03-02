@@ -90,18 +90,18 @@ const char *get_uptime() {
 
 int main(int argc, char *argv[]) {
     if (argc > 1) {
-        if (!strcmp(argv[2], "-p")) {
+        if (!strcmp(argv[1], "-p")) {
             handler(power_poweroff);
             return 0;
-        } else if (!strcmp(argv[2], "-r")) {
+        } else if (!strcmp(argv[1], "-r")) {
             handler(power_reboot);
             return 0;
-        } else if (!strcmp(argv[2], "-s")) {
+        } else if (!strcmp(argv[1], "-s")) {
             handler(power_suspend);
-    	return 0;
-        } else if (!strcmp(argv[2], "-u")) {
-            printf("%s", get_uptime());
-    	return 0;
+    	    return 0;
+        } else if (!strcmp(argv[1], "-u")) {
+            printf("%s\n", get_uptime());
+    	    return 0;
         }
     }
 
