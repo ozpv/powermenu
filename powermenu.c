@@ -70,7 +70,7 @@ const char *parse_o(char *cmd) {
     return buf;
 }
 
-const char *get_uptime() {
+char *get_uptime() {
     struct sysinfo si;
     char up[PATH_MAX];
 
