@@ -89,6 +89,8 @@ const char *get_uptime() {
 }
 
 int main(int argc, char *argv[]) {
+    int no_input = 0;
+
     if (argc > 1) {
         if (!strcmp(argv[1], "-p")) {
             handler(power_poweroff);
@@ -102,7 +104,9 @@ int main(int argc, char *argv[]) {
         } else if (!strcmp(argv[1], "-u")) {
             printf("%s\n", get_uptime());
     	    return 0;
-        }
+        } else if (!strcmp(argv[1], "-n")) {
+	    no_input = 1;
+	}
     }
 
     static char cmd[PATH_MAX]; 
@@ -118,7 +122,7 @@ int main(int argc, char *argv[]) {
     strncat(cmd, options[i].name, strlen(options[i].name));
 
     char final[PATH_MAX / 4]; 
-    sprintf(final, "\" | dmenu -p \"%s\"", get_uptime());
+    sprintf(final, no_input ? "\" | dmenu -noi -p \"%s\"" : "\" | dmenu -p \"%s\"", get_uptime());
     strncat(cmd, final, strlen(final));
 
     match(parse_o(cmd));
